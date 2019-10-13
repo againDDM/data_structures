@@ -5,31 +5,31 @@ import (
 	"os"
 )
 
-type limitedQueue struct {
+type QueueLimited struct {
 	limit uint64
 	queue []int
 }
 
-func newLimitedQueue(limit uint64) limitedQueue {
-	return limitedQueue{
+func NewQueueLimited(limit uint64) QueueLimited {
+	return QueueLimited{
 		limit: limit,
 		queue: make([]int, 0, limit),
 	}
 }
 
-func (q *limitedQueue) len() uint64 {
+func (q *QueueLimited) len() uint64 {
 	return uint64(len(q.queue))
 }
 
-func (q *limitedQueue) isFull() bool {
+func (q *QueueLimited) isFull() bool {
 	return q.len() == q.limit
 }
 
-func (q *limitedQueue) isEmpty() bool {
+func (q *QueueLimited) isEmpty() bool {
 	return q.len() == 0
 }
 
-func (q *limitedQueue) promote(till int) {
+func (q *QueueLimited) promote(till int) {
 	var numPop int
 	for i, packet := range q.queue {
 		if packet > till {
@@ -42,14 +42,14 @@ func (q *limitedQueue) promote(till int) {
 	//	fmt.Println(q.queue)
 }
 
-func (q *limitedQueue) last() int {
+func (q *QueueLimited) last() int {
 	if q.isEmpty() {
 		return 0
 	}
 	return q.queue[q.len()-1]
 }
 
-func (q *limitedQueue) enqueue(arrival, duration int) (result int) {
+func (q *QueueLimited) Enqueue(arrival, duration int) (result int) {
 	q.promote(arrival)
 	if q.isFull() {
 		return -1
@@ -66,10 +66,10 @@ func (q *limitedQueue) enqueue(arrival, duration int) (result int) {
 func main() {
 	var size, n int
 	fmt.Fscan(os.Stdin, &size, &n)
-	workQueue := newLimitedQueue(uint64(size))
+	workQueue := NewQueueLimited(uint64(size))
 	for i := 0; i < n; i++ {
 		var arrival, duration int
 		fmt.Fscan(os.Stdin, &arrival, &duration)
-		fmt.Println(workQueue.enqueue(arrival, duration))
+		fmt.Println(workQueue.Enqueue(arrival, duration))
 	}
 }

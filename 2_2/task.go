@@ -16,11 +16,16 @@ type tree struct {
 
 func readInput() (string, string) {
 	reader := bufio.NewReader(os.Stdin)
-	line1, _ := reader.ReadString('\n')
+	line1, err := reader.ReadString('\n')
+	if err != nil {
+		panic("Can`t read")
+	}
 	line1 = line1[:len(line1)-1]
-	line2, _ := reader.ReadString('\n')
+	line2, err := reader.ReadString('\n')
+	if err != nil {
+		panic("Can`t read")
+	}
 	line2 = line2[:len(line2)-1]
-
 	return line1, line2
 }
 
@@ -48,13 +53,13 @@ func fillNodes(nodes []*tree, nodeParentsId []*int) {
 	}
 }
 
-func findRoot(nodes []*tree) *tree {
+func findRoot(nodes []*tree) (*tree, error) {
 	for _, value := range nodes {
 		if value.parent == nil {
-			return value
+			return value, nil
 		}
 	}
-	panic("not found")
+	return nil, fmt.Errorf("not found")
 }
 
 func getLength(treeToCheck *tree) int {
@@ -72,13 +77,21 @@ func max(a, b int) int {
 	return b
 }
 
-func main() {
-	line1, line2 := readInput()
-
+func work(line1, line2 string) (int, error) {
 	_, nodeParentsId := parseInput(line1, line2)
 	nodes := make([]*tree, len(nodeParentsId))
 	fillNodes(nodes, nodeParentsId)
-	rootNode := findRoot(nodes)
-	output := getLength(rootNode)
-	fmt.Println(output)
+	rootNode, err := findRoot(nodes)
+	if err != nil {
+		return 0, err
+	}
+	return getLength(rootNode), nil
+}
+
+func main() {
+	output, err := work(readInput()); if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println(output)
+	}
 }

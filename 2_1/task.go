@@ -55,22 +55,22 @@ func (s *stack) pop() (top stackElement, empty bool) {
 	return
 }
 
-func checkBracket(input *string) (output int) {
-	symbols := utf8.RuneCountInString(*input)
+func checkBracket(input string) (output int) {
+	symbols := utf8.RuneCountInString(input)
 	bracketMap := map[rune]rune{
 		125: 123, // '}': '{'
 		93:  91,  // ']': '['
 		41:  40,  // ')': '('
 	}
-	workSstack := newStack(uint64(symbols))
-	for i, r := range *input {
+	workStack := newStack(uint64(symbols))
+	for i, r := range input {
 		switch r {
 		case 123, 91, 40: // { [ (
-			workSstack.push(stackElement{r, i})
+			workStack.push(stackElement{r, i})
 		case 125, 93, 41: // } ] )
 			var top stackElement
 			var empty bool
-			top, empty = workSstack.pop()
+			top, empty = workStack.pop()
 			if empty || bracketMap[r] != top.symbol {
 				output = i + 1
 				return
@@ -78,7 +78,7 @@ func checkBracket(input *string) (output int) {
 		}
 	}
 	if output == 0 {
-		lees, empty := workSstack.top()
+		lees, empty := workStack.top()
 		if !empty {
 			output = lees.position + 1
 		}
@@ -89,7 +89,7 @@ func checkBracket(input *string) (output int) {
 func main() {
 	var input string
 	fmt.Fscan(os.Stdin, &input)
-	output := checkBracket(&input)
+	output := checkBracket(input)
 	if output == 0 {
 		fmt.Print("Success")
 	} else {
